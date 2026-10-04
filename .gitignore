@@ -1,0 +1,39 @@
+# Build outputs
+build/
+build-*/
+_artefacts/
+out/
+
+# IDE
+.vs/
+.vscode/
+*.user
+
+# Model checkpoints are never committed (licensing + size).
+# Only manifests belong in the repository.
+models/**
+!models/README.md
+!models/manifest.example.json
+
+# Datasets are never committed.
+ml/datasets/downloaded/
+ml/datasets/**/*.wav
+ml/datasets/**/*.flac
+ml/datasets/**/*.mp3
+
+# Local scratch
+*.log
+
+# Python.venv/
+**/.venv/
+__pycache__/
+*.pyc
+node_modules/
+
+# Heavy model artefacts stay out of git (manifests only).
+*.onnx
+*.pt
+*.pth
+*.safetensors
+*.gguf
+ml/export/

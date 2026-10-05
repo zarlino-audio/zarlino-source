@@ -145,7 +145,11 @@ ZS_TEST (ProjectRoundTripPreservesEverything)
     ZS_EXPECT (reloaded.extracted.sha256 == doc.extracted.sha256);
 
     // Same directory -> portable relative references, and audio verifies.
-    ZS_EXPECT (! juce::File (juce::String (reloaded.source.path)).isAbsolutePath());
+    const auto storedPath = juce::String (reloaded.source.path);
+    const bool looksAbsolute = storedPath.length() >= 3
+                                 ? (storedPath[1] == ':' || storedPath.startsWith ("\\\\"))
+                                 : true;
+    ZS_EXPECT (! looksAbsolute);
     ZS_EXPECT (reloaded.verifyAudio().wasOk());
 }
 

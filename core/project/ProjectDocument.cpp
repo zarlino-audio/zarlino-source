@@ -2,9 +2,11 @@
 
 #include "core/audio/AudioDocument.h"
 
+#include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_cryptography/juce_cryptography.h>
 
 #include <algorithm>
+#include <cctype>
 
 namespace zarlino::source::project
 {
@@ -13,6 +15,20 @@ namespace
 {
     juce::String toJuce (const std::string& s) { return juce::String (s); }
     std::string toStd (const juce::String& s) { return s.toStdString(); }
+
+    /** Path-shape test that does not depend on a JUCE API signature: a drive
+        letter, a UNC prefix or a leading slash means absolute. */
+    bool isAbsoluteStoredPath (const std::string& path)
+    {
+        if (path.size() >= 3 && std::isalpha ((unsigned char) path[0]) != 0
+            && path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
+            return true;
+
+        if (path.size() >= 2 && path[0] == '\\' && path[1] == '\\')
+            return true;
+
+        return ! path.empty() && (path[0] == '/' || path[0] == '\\');
+    }
 
     juce::String hexOf (const juce::MemoryBlock& block, int byteLimit)
     {
@@ -355,7 +371,7 @@ juce::File ProjectDocument::resolve (const std::string& storedPath) const
 
     juce::File file (toJuce (storedPath));
 
-    if (file.isAbsolutePath())
+    if (isAbsoluteStoredPath (storedPath))
         return file;
 
     return projectFile.getParentDirectory().getChildFile (toJuce (storedPath));
